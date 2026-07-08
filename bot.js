@@ -12,7 +12,7 @@ let timer = null;
 let userLastUsed = {};
 let messageCount = 0;
 
-// ✅ Generate Random User ID
+// ✅ Generate Random User ID - Pehle Jaisa
 function generateRandomUserId() {
   const now = Date.now();
 
@@ -112,7 +112,7 @@ async function sendSecondMessage(userId, runTime) {
 
 // 🔥 MAIN FUNCTION
 async function startConversation() {
-  console.log("🚀 Started - 3 messages per minute (₹0.1) + Random second messages (₹5) - SAB BOLD");
+  console.log("🚀 Started");
 
   timer = setInterval(async () => {
     if (!running) {
@@ -121,14 +121,27 @@ async function startConversation() {
       return;
     }
 
+    const now = new Date();
     console.log(`⏰ Running at ${getIndianTime()}`);
 
     // ===== 3 Messages with ₹0.1 =====
     for (let i = 0; i < 3; i++) {
       try {
         let userId = generateRandomUserId();
-        let runTime = getIndianTime();
-        let trackTime = getIndianTime();
+        let currentTime = getIndianTime();
+        
+        // ✅ Run Time = Current Time - 1 Minute
+        let runTimeDate = new Date(now.getTime() - 60000);
+        const day = String(runTimeDate.getDate()).padStart(2, '0');
+        const month = String(runTimeDate.getMonth() + 1).padStart(2, '0');
+        const year = runTimeDate.getFullYear();
+        const hours = String(runTimeDate.getHours()).padStart(2, '0');
+        const minutes = String(runTimeDate.getMinutes()).padStart(2, '0');
+        const seconds = String(runTimeDate.getSeconds()).padStart(2, '0');
+        let runTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+
+        // ✅ Track Time = Current Time
+        let trackTime = currentTime;
 
         await sendMessageToChannel(userId, "0.1", runTime, trackTime);
         sendSecondMessage(userId, runTime);
@@ -164,6 +177,8 @@ bot.onText(/\/test/, async (msg) => {
   running = true;
   messageCount = 0;
   startConversation();
+  
+  // ✅ INSTANT REPLY
   bot.sendMessage(chatId, "✅ Started! SAB BOLD + NO AM/PM");
 });
 
@@ -205,4 +220,4 @@ app.listen(PORT, () => {
 console.log("🤖 Bot Started...");
 console.log(`📢 Channel: ${CHANNEL_ID}`);
 console.log(`🕐 Indian Time: ${getIndianTime()}`);
-console.log("✨ SAB BOLD + NO AM/PM");
+console.log("✨ SAB BOLD + NO AM/PM + INSTANT REPLY");
