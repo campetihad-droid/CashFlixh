@@ -12,7 +12,7 @@ let timer = null;
 let userLastUsed = {};
 let messageCount = 0;
 
-// ✅ Pehle Wala Generate Random User ID
+// ✅ Generate Random User ID
 function generateRandomUserId() {
   const now = Date.now();
 
@@ -36,7 +36,7 @@ function generateRandomUserId() {
   }
 }
 
-// ✅ Indian Time Formatter (DD/MM/YYYY, HH:MM:SS AM/PM)
+// ✅ Indian Time - BINA AM/PM
 function getIndianTime() {
   const now = new Date();
   
@@ -44,42 +44,38 @@ function getIndianTime() {
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const year = now.getFullYear();
   
-  let hours = now.getHours();
+  const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
   
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  const formattedHours = String(hours).padStart(2, '0');
-  
-  return `${day}/${month}/${year}, ${formattedHours}:${minutes}:${seconds} ${ampm}`;
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
-// ✅ Build Message - Bilkul Pehle Jaisa
+// ✅ SAB BOLD Message Format
 function buildMessage(userId, amount, runTime, trackTime) {
   return (
-`Test Conversation Count 💝
+`*Test Conversation Count 💝*
 
-🎁 Offer Name - Test
+*🎁 Offer Name - Test*
 
-User Id : ${userId}
-User Amount : ₹${amount}
-🥳 User Payment : Success
+*User Id :* ${userId}
+*User Amount :* ₹${amount}
+*🥳 User Payment :* Success
 
-Run Time - ${runTime}
-Track Time - ${trackTime}
+*Run Time -* ${runTime}
+*Track Time -* ${trackTime}
 
-Powered By - CashFlix`
+*Powered By - CashFlix*`
   );
 }
 
-// Send Message Function
+// ✅ Send Message with SAB BOLD
 async function sendMessageToChannel(userId, amount, runTime, trackTime) {
   try {
     await bot.sendMessage(
       CHANNEL_ID,
-      buildMessage(userId, amount, runTime, trackTime)
+      buildMessage(userId, amount, runTime, trackTime),
+      { parse_mode: "Markdown" }
     );
     messageCount++;
     console.log(`✅ ₹${amount} message sent for ${userId}`);
@@ -103,7 +99,8 @@ async function sendSecondMessage(userId, runTime) {
       const trackTime = getIndianTime();
       await bot.sendMessage(
         CHANNEL_ID,
-        buildMessage(userId, "5", runTime, trackTime)
+        buildMessage(userId, "5", runTime, trackTime),
+        { parse_mode: "Markdown" }
       );
       messageCount++;
       console.log(`✅ ₹5 message sent for ${userId}`);
@@ -115,7 +112,7 @@ async function sendSecondMessage(userId, runTime) {
 
 // 🔥 MAIN FUNCTION
 async function startConversation() {
-  console.log("🚀 Started - 3 messages per minute (₹0.1) + Random second messages (₹5)");
+  console.log("🚀 Started - 3 messages per minute (₹0.1) + Random second messages (₹5) - SAB BOLD");
 
   timer = setInterval(async () => {
     if (!running) {
@@ -167,7 +164,7 @@ bot.onText(/\/test/, async (msg) => {
   running = true;
   messageCount = 0;
   startConversation();
-  bot.sendMessage(chatId, "✅ Started! 3x ₹0.1 + Random ₹5 (1-2 min)");
+  bot.sendMessage(chatId, "✅ Started! SAB BOLD + NO AM/PM");
 });
 
 bot.onText(/\/stop/, (msg) => {
@@ -193,7 +190,7 @@ Time: ${getIndianTime()}
   `);
 });
 
-// ===== PORT KE LIYE (Render Ke Liye) =====
+// ===== PORT KE LIYE =====
 const express = require('express');
 const app = express();
 
@@ -208,3 +205,4 @@ app.listen(PORT, () => {
 console.log("🤖 Bot Started...");
 console.log(`📢 Channel: ${CHANNEL_ID}`);
 console.log(`🕐 Indian Time: ${getIndianTime()}`);
+console.log("✨ SAB BOLD + NO AM/PM");
