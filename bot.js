@@ -12,7 +12,7 @@ let timer = null;
 let userLastUsed = {};
 let messageCount = 0;
 
-// ✅ Generate Random User ID - Pehle Jaisa
+// ✅ Sahi User ID Generate - 4 digit****4 digit
 function generateRandomUserId() {
   const now = Date.now();
 
@@ -28,7 +28,9 @@ function generateRandomUserId() {
   }
 
   while (true) {
-    let uid = `${Math.floor(Math.random() * 4000 + 6000)}****${Math.floor(Math.random() * 9000 + 1000)}`;
+    let first4 = Math.floor(Math.random() * 4000 + 6000);
+    let last4 = Math.floor(Math.random() * 9000 + 1000);
+    let uid = `${first4}****${last4}`;
     if (!userLastUsed[uid]) {
       userLastUsed[uid] = now;
       return uid;
@@ -36,19 +38,67 @@ function generateRandomUserId() {
   }
 }
 
-// ✅ Indian Time - BINA AM/PM
+// ✅ INDIAN REAL TIME - BINA AM/PM (DD/MM/YYYY HH:MM:SS)
 function getIndianTime() {
   const now = new Date();
   
-  const day = String(now.getDate()).padStart(2, '0');
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const year = now.getFullYear();
+  // Indian Time Zone (IST)
+  const options = {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  };
   
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const formatter = new Intl.DateTimeFormat('en-IN', options);
+  const parts = formatter.formatToParts(now);
   
-  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+  let day, month, year, hour, minute, second;
+  
+  parts.forEach(part => {
+    if (part.type === 'day') day = part.value;
+    if (part.type === 'month') month = part.value;
+    if (part.type === 'year') year = part.value;
+    if (part.type === 'hour') hour = part.value;
+    if (part.type === 'minute') minute = part.value;
+    if (part.type === 'second') second = part.value;
+  });
+  
+  return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+}
+
+// ✅ Format Time Function - Run Time Ke Liye
+function formatTime(date) {
+  const options = {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  };
+  
+  const formatter = new Intl.DateTimeFormat('en-IN', options);
+  const parts = formatter.formatToParts(date);
+  
+  let day, month, year, hour, minute, second;
+  
+  parts.forEach(part => {
+    if (part.type === 'day') day = part.value;
+    if (part.type === 'month') month = part.value;
+    if (part.type === 'year') year = part.value;
+    if (part.type === 'hour') hour = part.value;
+    if (part.type === 'minute') minute = part.value;
+    if (part.type === 'second') second = part.value;
+  });
+  
+  return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
 }
 
 // ✅ SAB BOLD Message Format
@@ -69,7 +119,7 @@ function buildMessage(userId, amount, runTime, trackTime) {
   );
 }
 
-// ✅ Send Message with SAB BOLD
+// ✅ Send Message Function
 async function sendMessageToChannel(userId, amount, runTime, trackTime) {
   try {
     await bot.sendMessage(
@@ -78,7 +128,7 @@ async function sendMessageToChannel(userId, amount, runTime, trackTime) {
       { parse_mode: "Markdown" }
     );
     messageCount++;
-    console.log(`✅ ₹${amount} message sent for ${userId}`);
+    console.log(`✅ ₹${amount} message sent for ${userId} at ${getIndianTime()}`);
     return true;
   } catch (error) {
     console.error(`❌ Error:`, error.message);
@@ -86,7 +136,7 @@ async function sendMessageToChannel(userId, amount, runTime, trackTime) {
   }
 }
 
-// 🔥 Second Message - Random 1-2 Minute
+// ✅ Second Message - Run Time Pehle Wala, Track Time INDIAN REAL TIME
 async function sendSecondMessage(userId, runTime) {
   const randomDelay = Math.floor(Math.random() * 60000) + 60000;
   
@@ -96,14 +146,15 @@ async function sendSecondMessage(userId, runTime) {
     if (!running) return;
     
     try {
-      const trackTime = getIndianTime();
+      const now = new Date();
+      const trackTime = formatTime(now); // ✅ INDIAN REAL TIME
       await bot.sendMessage(
         CHANNEL_ID,
         buildMessage(userId, "5", runTime, trackTime),
         { parse_mode: "Markdown" }
       );
       messageCount++;
-      console.log(`✅ ₹5 message sent for ${userId}`);
+      console.log(`✅ ₹5 message sent for ${userId} at ${getIndianTime()}`);
     } catch (error) {
       console.error(`❌ Second message error:`, error.message);
     }
@@ -112,7 +163,7 @@ async function sendSecondMessage(userId, runTime) {
 
 // 🔥 MAIN FUNCTION
 async function startConversation() {
-  console.log("🚀 Started");
+  console.log("🚀 Started - INDIAN REAL TIME");
 
   timer = setInterval(async () => {
     if (!running) {
@@ -124,24 +175,16 @@ async function startConversation() {
     const now = new Date();
     console.log(`⏰ Running at ${getIndianTime()}`);
 
-    // ===== 3 Messages with ₹0.1 =====
     for (let i = 0; i < 3; i++) {
       try {
         let userId = generateRandomUserId();
-        let currentTime = getIndianTime();
         
-        // ✅ Run Time = Current Time - 1 Minute
+        // ✅ Run Time = Current Time - 1 Minute (INDIAN TIME)
         let runTimeDate = new Date(now.getTime() - 60000);
-        const day = String(runTimeDate.getDate()).padStart(2, '0');
-        const month = String(runTimeDate.getMonth() + 1).padStart(2, '0');
-        const year = runTimeDate.getFullYear();
-        const hours = String(runTimeDate.getHours()).padStart(2, '0');
-        const minutes = String(runTimeDate.getMinutes()).padStart(2, '0');
-        const seconds = String(runTimeDate.getSeconds()).padStart(2, '0');
-        let runTime = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        let runTime = formatTime(runTimeDate);
 
-        // ✅ Track Time = Current Time
-        let trackTime = currentTime;
+        // ✅ Track Time = INDIAN REAL TIME
+        let trackTime = formatTime(now);
 
         await sendMessageToChannel(userId, "0.1", runTime, trackTime);
         sendSecondMessage(userId, runTime);
@@ -158,7 +201,7 @@ async function startConversation() {
   }, 60000);
 }
 
-// ===== TELEGRAM COMMANDS =====
+// ===== COMMANDS =====
 
 bot.onText(/\/test/, async (msg) => {
   const chatId = msg.chat.id;
@@ -177,9 +220,7 @@ bot.onText(/\/test/, async (msg) => {
   running = true;
   messageCount = 0;
   startConversation();
-  
-  // ✅ INSTANT REPLY
-  bot.sendMessage(chatId, "✅ Started! SAB BOLD + NO AM/PM");
+  bot.sendMessage(chatId, "✅ Started! INDIAN REAL TIME");
 });
 
 bot.onText(/\/stop/, (msg) => {
@@ -205,7 +246,7 @@ Time: ${getIndianTime()}
   `);
 });
 
-// ===== PORT KE LIYE =====
+// ===== PORT =====
 const express = require('express');
 const app = express();
 
@@ -219,5 +260,5 @@ app.listen(PORT, () => {
 
 console.log("🤖 Bot Started...");
 console.log(`📢 Channel: ${CHANNEL_ID}`);
-console.log(`🕐 Indian Time: ${getIndianTime()}`);
-console.log("✨ SAB BOLD + NO AM/PM + INSTANT REPLY");
+console.log(`🕐 INDIAN REAL TIME: ${getIndianTime()}`);
+console.log("✨ PERFECT: Bold + User ID + Run Time 1 min behind + INDIAN REAL TIME");
